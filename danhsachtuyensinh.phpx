@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Sheets Data</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+
+
+<?php
+
+require_once 'GSConnector.php';
+
+// $spreadsheetId = '1in2F7j27SwpZTdjw0uBb68ucQBIobGpZ4XPxrXF43qs'; // ID bang tinh Google Sheets
+
+// $spreadsheetId = '1GW060f2oRWxQkmGr2t481Npl0GHIc_PpAJQD964koww';
+
+$spreadsheetId = '1YC8g0h26_kpR8wo1Ctlbdw9CBRJMwAo3JWCmIRAyCO4';
+
+// Lay du lieu tu Google Sheets
+$range = 'Data!A1:Z5';
+
+$googleSheetsConnector = new GoogleSheetsConnector();
+
+$values = $values = $googleSheetsConnector->getGoogleSheetsData($spreadsheetId, $range);
+
+// Display data in HTML table
+if (!empty($values)) {
+    echo '<table>';
+    echo '<tr>';
+    foreach ($values[0] as $header) {
+        echo '<th>' . $header . '</th>';
+    }
+    echo '</tr>';
+
+    foreach (array_slice($values, 1) as $row) {
+        echo '<tr>';
+        foreach ($row as $cell) {
+            echo '<td>' . $cell . '</td>';
+        }
+        echo '</tr>';
+    }
+
+    echo '</table>';
+} else {
+    echo 'No data found.';
+}
+
+function getGoogleSheetsData($spreadsheetId, $range) {
+    // Include the Google API Client library
+    require_once __DIR__ . '/vendor/autoload.php';
+
+    $client = new Google_Client();
+    $client->setAuthConfig('path/to/your/credentials.json');
+    $client->setAccessType('offline');
+    $client->setScopes([Google_Service_Sheets::SPREADSHEETS]);
+
+    $service = new Google_Service_Sheets($client);
+
+    $response = $service->spreadsheets_values->get($spreadsheetId, $range);
+    return $response->getValues();
+}
+
+// // Ghi d? li?u vào Google Sheets
+// $rangeToWrite = 'Data!A3:B3'; // Thay th? b?ng ph?m vi b?n mu?n ghi d? li?u
+// $valuesToWrite = [
+    // ["New Data 1", "New Data 2"]
+// ];
+
+// $body = new Google_Service_Sheets_ValueRange([
+    // 'values' => $valuesToWrite
+// ]);
+
+// $params = [
+    // 'valueInputOption' => 'RAW'
+// ];
+
+// $result = $service->spreadsheets_values->update($spreadsheetId, $rangeToWrite, $body, $params);
+// print_r($result);
+?>
+
+</body>
+</html>
